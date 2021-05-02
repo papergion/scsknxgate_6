@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.001 "
+#define _FW_VERSION  "VER_6.002 "
 #define _ESP_CORE    "esp8266-2.5.2"
 
 #define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
@@ -38,6 +38,7 @@
 
 //  adeguare pagina test a scs
   
+// 6.002  modifica fauxmoesp - adeguamento nuova versione alexa  
 // 6.001  rifacimento knx x opzione 4 - indirizzi random - master e move
 // rimosso ("/devicename", handleDeviceName);    // processo di rinominazione dei devices per alexa
 

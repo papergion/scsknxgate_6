@@ -30,9 +30,10 @@ THE SOFTWARE.
 
 // ---------------------------------------------------------------------------------------------------
 #define SHORT_DECLARE
-//#define UNIQUE_MACADDRESS
+//#define UNIQUE_MY "00:17:88:01:00:f0:"
+//#define UNIQUE_MY "00:17:88:b4:d6:c7:"
 #define SHORT_MACADDRESS
-//#define UNIQUE_MY "scs#"
+//#define UNIQUE_MACADDRESS
 // ---------------------------------------------------------------------------------------------------
 
 PROGMEM const char FAUXMO_TCP_HEADERS[] =
@@ -40,11 +41,6 @@ PROGMEM const char FAUXMO_TCP_HEADERS[] =
     "Content-Type: %s\r\n"
     "Content-Length: %d\r\n"
     "Connection: close\r\n\r\n";
-
-//PROGMEM const char FAUXMO_TCP_STATE_RESPONSE[] = "["
-//    "{\"success\":{\"/lights/%d/state/on\":%s}},"
-//    "{\"success\":{\"/lights/%d/state/bri\":%d}}"   // not needed?
-//"]";
 
 PROGMEM const char FAUXMO_TCP_STATE_RESPONSE[] = "["
     "{\"success\":{\"/lights/%d/state/on\":%s}}"
@@ -63,14 +59,17 @@ PROGMEM const char FAUXMO_DEVICE_JSON_TEMPLATE_FIRST[] = "{"
     "\"uniqueid\":\""
 #ifdef UNIQUE_MACADDRESS
     "%s"
+    "-%d\","
 #endif
 #ifdef SHORT_MACADDRESS
-    "%s"
+	"00:17:88:"
+	"%s:"
+	"%02x:e9-0b\","
 #endif
 #ifdef UNIQUE_MY
     UNIQUE_MY
+    "%02x:e9-0b\","
 #endif
-    "-%d\","
 	"\"capabilities\":{}"
 "}";
 
@@ -81,14 +80,17 @@ PROGMEM const char FAUXMO_DEVICE_JSON_TEMPLATE[] = "{"
     "\"uniqueid\":\""
 #ifdef UNIQUE_MACADDRESS
     "%s"
+    "-%d\","
 #endif
 #ifdef SHORT_MACADDRESS
-    "%s"
+	"00:17:88:"
+	"%s:"
+	"%02x:e9-0b\","
 #endif
 #ifdef UNIQUE_MY
     UNIQUE_MY
+    "%02x:e9-0b\","
 #endif
-    "-%d\","
     "\"modelid\":\"LCT007\","
     "\"state\":{"
         "\"on\":%s,\"bri\":%d,\"xy\":[0,0],\"reachable\": true"

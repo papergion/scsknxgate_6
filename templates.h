@@ -55,8 +55,8 @@ PROGMEM const char FAUXMO_TCP_VALUE_RESPONSE[] = "["
 // json per dichiarativa iniziale - nel buffer (2920 bytes) ci stanno così fino a 37 dispositivi
 // se il buffer e' 1000 bytes) ci stanno fino a 12 dispositivi
 PROGMEM const char FAUXMO_DEVICE_JSON_TEMPLATE_FIRST[] = "{"
-    "\"name\":\"%s\","    // max name length 20 bytes
-    "\"uniqueid\":\""
+    "\"name\":\"%s\","    // max name length 20 bytes - 32 
+    "\"uniqueid\":\""     // +12
 #ifdef UNIQUE_MACADDRESS
     "%s"
     "-%d\","
@@ -64,13 +64,13 @@ PROGMEM const char FAUXMO_DEVICE_JSON_TEMPLATE_FIRST[] = "{"
 #ifdef SHORT_MACADDRESS
 	"00:17:88:"
 	"%s:"
-	"%02x:e9-0b\","
+	"%02x:e9-0b\","         // +30
 #endif
 #ifdef UNIQUE_MY
     UNIQUE_MY
     "%02x:e9-0b\","
 #endif
-	"\"capabilities\":{}"
+	"\"capabilities\":{}"   // 18
 "}";
 
 // json per stato di dettaglio del dispositivo

@@ -30,6 +30,7 @@
 #include "fauxmoESP.h"
 unsigned char iDevice = 0;
 unsigned char iDiscovered = 0;
+unsigned int  iqueryed = 0;
 String macaddress;
 String macshort;
 
@@ -217,8 +218,8 @@ bool fauxmoESP::_onTCPList(AsyncClient *client, String url, String body) {
     if (iDevice < _devices.size())
     {
       response += "{";
-      while ((response.length() < 928) && (iDevice < _devices.size()))
-//    while ((response.length() < 1500-(strlen_P(FAUXMO_DEVICE_JSON_TEMPLATE) + 64))  && (iDevice < _devices.size()));
+//      while ((response.length() < HUE_TCP_PACKETSIZE) && (iDevice < _devices.size()))
+      while ((response.length() < HUE_TCP_PACKETSIZE) && (iDevice < _devices.size()))
       {
         if (first++ > 0) response += ",";
 #ifdef SHORT_DECLARE
@@ -239,6 +240,7 @@ bool fauxmoESP::_onTCPList(AsyncClient *client, String url, String body) {
   } else {
 
     response = _deviceJson(id - 1);
+    iqueryed++;
 
 #ifdef MY_DEBUG_FAUXMO         
     //    Serial.print("[FAUXMO] Handling single device\r\n");
@@ -265,6 +267,10 @@ bool fauxmoESP::_onTCPList(AsyncClient *client, String url, String body) {
 unsigned char fauxmoESP::discovered(void)
 {
   return iDiscovered;
+}
+unsigned int fauxmoESP::queryed(void)
+{
+  return iqueryed;
 }
 
 unsigned char fauxmoESP::devices(void)

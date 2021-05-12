@@ -1,13 +1,17 @@
 //----------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.002 "
-#define _ESP_CORE    "esp8266-2.5.2"
+#define _FW_VERSION  "VER_6.009 "
+#define _ESP_CORE    "esp8266-2.7.4"
 
 #define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
 #define KNX
 //#define SCS
 //#define DEBUG
 
+//                              ========================================================
+//#define TCP_MSS       1024 // compilare con OPZIONE lwip variant: V2 higher bandwidth
+//                              ========================================================
+ 
 //----------------------------------------------------------------------------------
 //        ---- attenzione - porta http: 8080 <--se alexaParam=y--------------
 
@@ -2368,6 +2372,8 @@ void handleStatus()
     content += temp;
     sprintf(temp, "<li>  %d devices discovered</li>", fauxmo.discovered());
     content += temp;
+    sprintf(temp, "<li>  %d devices queryed</li>", fauxmo.queryed());
+    content += temp;
   }
   else
   {
@@ -2427,6 +2433,9 @@ void handleStatus()
   content += "</li>";
 
   sprintf(temp, "<li>Free heap: %d bytes</li>", ESP.getFreeHeap());
+  content += temp;
+
+  sprintf(temp, "<li>TCP_MSS: %d </li>", TCP_MSS);
   content += temp;
 
   content += "<li>";
@@ -3102,6 +3111,7 @@ void setup() {
   }
 //===============================================================================
 #ifdef DEBUG
+// ----------------------------------------- DEBUG -------------------------------------------
   Serial.println();
   Serial.println();
   Serial.println("Startup");
@@ -3188,11 +3198,15 @@ void setup() {
   
 #else
 // -------------------------------------- NO DEBUG -------------------------------------------
-  Serial.setTimeout(1000);
+  Serial.setTimeout(2000);
 #ifdef NO_JUMPER
+  while (!Serial) { ; }
+  delay(100);            // wait 100ms
+  Serial.flush();
   do {  
      if (!Serial.available())
      {
+       Serial.write('@'); 
        Serial.write('@'); 
        Serial.write('Q');
        Serial.write('R');

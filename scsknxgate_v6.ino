@@ -1,10 +1,11 @@
-//----------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.009 "
+#define _FW_VERSION  "VER_6.010 "
 #define _ESP_CORE    "esp8266-2.7.4"
 
 #define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
 #define KNX
+//#define NO_AP          // con questo setting, se parte in modo AP dopo 2 minuti senza chiamate di setup si resetta
 //#define SCS
 //#define DEBUG
 
@@ -310,6 +311,9 @@ char domotic_options;  // 1= knx - indirizzi base dispari   0= base pari   3=mul
 
 char alexaParam = 0;
 int  countRestart = 0;
+#ifdef NO_AP
+int  no_ap = 0;
+#endif
 char previous_address = 0;     // device id - address
 
 WiFiClient espClient;
@@ -1563,6 +1567,9 @@ void handleScan()
   else
     sTemp = WiFi.localIP().toString();
     
+#ifdef NO_AP
+  no_ap = 0;
+#endif
   content = "<!DOCTYPE HTML>\r\n<html>Hello from ESP_" _MODO "GATE " _FW_VERSION " at ";
   content += sTemp;
   content += "<p>";
@@ -1620,6 +1627,9 @@ void handleSetting()
 
   server.send(statusCode, "application/json", content);
   content = "";
+#ifdef NO_AP
+  no_ap = 0;
+#endif
 }
 // =============================================================================================
 void handleRoot()
@@ -4644,6 +4654,11 @@ if (sm_picprog == PICPROG_FREE)
           ledCtr = 0;
           digitalWrite(LED_BUILTIN, LOW); // acceso
         }
+#ifdef NO_AP
+        no_ap++;
+        if (no_ap > 1200)    // 120 sec
+		    countRestart = 10;
+#endif
       }
    #endif
     }

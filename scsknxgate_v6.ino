@@ -1,14 +1,13 @@
 //--------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.010 "
+#define _FW_VERSION  "VER_6.011 "
 #define _ESP_CORE    "esp8266-2.7.4"
 
 #define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
-#define KNX
-//#define NO_AP          // con questo setting, se parte in modo AP dopo 2 minuti senza chiamate di setup si resetta
+#define KNX             // al momento SOLO  ==KNX==
+#define NO_AP          // con questo setting, se parte in modo AP dopo 2 minuti senza chiamate di setup si resetta
 //#define SCS
 //#define DEBUG
-
 //                              ========================================================
 //#define TCP_MSS       1024 // compilare con OPZIONE lwip variant: V2 higher bandwidth
 //                              ========================================================
@@ -3216,7 +3215,7 @@ void setup() {
   do {  
      if (!Serial.available())
      {
-       Serial.write('@'); 
+//     Serial.write('@'); 
        Serial.write('@'); 
        Serial.write('Q');
        Serial.write('R');
@@ -4655,9 +4654,28 @@ if (sm_picprog == PICPROG_FREE)
           digitalWrite(LED_BUILTIN, LOW); // acceso
         }
 #ifdef NO_AP
+#ifdef NO_JUMPER
         no_ap++;
-        if (no_ap > 1200)    // 120 sec
-		    countRestart = 10;
+        if (no_ap > 400)    // 120 sec
+        {
+           no_ap = 250;	// dopo altri  sec
+           while (!Serial) { ; }
+           delay(100);            // wait 100ms
+           Serial.flush();
+           do {  
+              if (!Serial.available())
+              {
+                Serial.write('@'); 
+                Serial.write('Q');
+                Serial.write('R');
+                delay(50);            // wait 50ms
+              }
+              Serial.readBytes(&serIniOption, 1);
+           } while ((serIniOption != 'a') && (serIniOption != 'A') && (serIniOption != 'r') && (serIniOption != 'c') && (serIniOption != 'S'));
+           if (serIniOption == 'c') 
+               countRestart = 10;
+        }
+ #endif
 #endif
       }
    #endif

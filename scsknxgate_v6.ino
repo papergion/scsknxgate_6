@@ -1,6 +1,6 @@
 //--------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.011 "
+#define _FW_VERSION  "VER_6.012 "
 #define _ESP_CORE    "esp8266-2.7.4"
 
 #define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
@@ -42,6 +42,7 @@
 
 //  adeguare pagina test a scs
   
+// 6.012  OTA verify  
 // 6.002  modifica fauxmoesp - adeguamento nuova versione alexa  
 // 6.001  rifacimento knx x opzione 4 - indirizzi random - master e move
 // rimosso ("/devicename", handleDeviceName);    // processo di rinominazione dei devices per alexa
@@ -94,7 +95,7 @@
 #define TCP_PORT 5045
 // verificare DEBUG_FAUXMO_TCP in fauxmoesp.h
 
-#define USE_OTA
+#define USE_OTA  // ==>ATTENZIONE<==  eventuali problemi OTA possono essere risolti disattivando il FIREWALL di rete (windows)
 
 #define BUFNR 2 // nr di buffer tx seriali
 /*
@@ -290,6 +291,8 @@ fauxmoESP fauxmo;
 unsigned char id_interfaccia_scs_knx = 0;
 unsigned char id_fauxmo = 0;
 unsigned char ArduinoOTAflag = 0;
+unsigned int otaError[8];
+unsigned char otaErrX = 0;
 #ifdef BLINKLED
 char ledCtr = 0;
 #endif
@@ -2353,6 +2356,23 @@ void handleStatus()
   if (ArduinoOTAflag > 0)
   {
     content += "<li>OTA update ready</li>";  
+    if (otaErrX != 0)
+    {
+      char tempX = 0;
+      while (tempX < otaErrX)
+      {     
+        content += "<li>--> ";
+        sprintf(temp,"ERR %u - ", otaError[tempX]);
+        content += temp; 
+        if (otaError[tempX] == OTA_AUTH_ERROR) content += "Auth Failed";
+         else if (otaError[tempX] == OTA_BEGIN_ERROR) content += "Begin Failed";
+         else if (otaError[tempX] == OTA_CONNECT_ERROR) content += "Connect Failed";
+         else if (otaError[tempX] == OTA_RECEIVE_ERROR) content += "Receive Failed";
+         else if (otaError[tempX] == OTA_END_ERROR) content += "End Failed";
+        content += "</li>";
+        tempX++;
+      }
+    }
   }
   content += "<li>";
   content += "Http callback setup = ";
@@ -4067,6 +4087,7 @@ void setup() {
         immediateSend();
 
         ArduinoOTAflag = 1;
+        otaErrX = 0;
         WriteEEP((char*)&device_BUS_id[0], E_MQTT_TABDEVICES, (int) DEV_NR * E_MQTT_TABLEN);
         EEPROM.commit();
       });
@@ -4099,8 +4120,10 @@ void setup() {
         else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
         else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
         else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-        else if (error == OTA_END_ERROR) Serial.println("End Failed");
+        else if (error == OTA_END_ERROR) Serial.println("End Failed - space");
 #endif
+        if (otaErrX < 8)
+          otaError[otaErrX++] = error;
       });
 
       ArduinoOTAflag = 1;

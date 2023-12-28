@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------------
 #define _FW_NAME     "SCSKNXGATE"
-#define _FW_VERSION  "VER_6.012 "
+#define _FW_VERSION  "VER_6.013 "
 #define _ESP_CORE    "esp8266-2.7.4"
 
-#define NO_JUMPER        // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
+//#define NO_JUMPER      // usare con ESP-M3  (esp8285) - cambiare anche setup IDE
 #define KNX             // al momento SOLO  ==KNX==
 #define NO_AP          // con questo setting, se parte in modo AP dopo 2 minuti senza chiamate di setup si resetta
 //#define SCS
@@ -137,6 +137,7 @@
   // --------------------------------------------------------------------------------------------------------------------------------------------------
   chiamate http:
     server.on ( "/", handleScan );                  // elenco reti wifi <- solo in modalita AP
+    server.on ( "/scan", handleScan);               // query connessione <- solo in modalita CLIENT
     server.on ( "/", handleRoot );                  // hello <- solo in modalità Wifi CLIENT
     server.on ("/test", handleTest);                // pagina html/js di test
     server.on ("/status", handleStatus);            // status display
@@ -1638,8 +1639,16 @@ void handleRoot()
 {
   content = "<!DOCTYPE HTML>\r\n<html>Hello from ESP_" _MODO "GATE " _FW_VERSION " at ";
   content += WiFi.localIP().toString();
-  content += "</html>";
-  
+  content += "<p><ol>";
+  content += "<li>/scan      (query connection)</li>";
+  content += "<li>/status    (display status)</li>";
+  content += "<li>/picprog   (verify/start PIC firmware programming)</li>";
+  content += "<li>/reset?device=pic / esp / all  (reset PIC/ESP processor)</li>";
+  content += "<li>/request   (command request)</li>";
+  content += "<li>/callback  (setup http callback)</li>";
+  content += "<li>/mqttconfig (setup mqtt broker)</li>";
+  content += "</ol>";
+  content += "</form></html>";
   server.send(200, "text/html", content);
   content = "";
 }
